@@ -1,1 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGPA Calculator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="./style.css">
+    
+</head>
+<body>
+    <div class="con">
+    <h1>SGPA Calculator</h1>
+    <div class="box">
+    <label  class="text"   for="registrationNumber">Enter Registration Number: </label>
+    <input  type="text" id="registrationNumber" />
+    <button class="bt" onclick="calculateSGPA()">Calculate SGPA</button>
+</div>
+    <p id="nameDisplay" class="nameDisplay"></p>
+    <p id="regDisplay" class="regDisplay"></p>
+    <p id="sgpaDisplay" class="sgpaDisplay"></p>
 
+
+    <script>
+        function calculateSGPA() {
+            const registrationNumber = document.getElementById('registrationNumber').value;
+            var regi = registrationNumber; // Use regi as the variable name
+            var name;
+
+            if (!registrationNumber) {
+                alert('Please enter a registration number.');
+                return;
+            }
+
+            const excelFileUrl = './result.xlsx';
+            fetch(excelFileUrl)
+                .then(response => response.arrayBuffer())
+                .then(data => {
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheetName = workbook.SheetNames[0];
+                    const sheet = workbook.Sheets[sheetName];
+
+                    const matchingRows = findRowsByRegistrationNumber(sheet, registrationNumber);
+
+                    if (matchingRows.length > 0) {
+                        let totalCredits = 0;
+                        let totalPoints = 0;
+                        let tableId = 1; // Unique ID for each table
+
+                        matchingRows.forEach((row, index) => {
+                            const lineg = row[7]; // Value in the "sg" column
+                            const linec = row[6]; // Assuming credits are in the sixth column
+                            let singlecr = eval(linec);
+                            console.log("Individual credits:" + singlecr);
+
+                            totalCredits = totalCredits + singlecr; // Accumulate total credits
+
+                            if (lineg == "O") {
+                                totalPoints += eval(10 * singlecr);
+                            } else if (lineg == "E") {
+                                totalPoints += eval(9 * singlecr);
+                            } else if (lineg == "A") {
+                                totalPoints += eval(8 * singlecr);
+                            } else if (lineg == "B") {
+                                totalPoints += eval(7 * singlecr);
+                            } else if (lineg == "C") {
+                                totalPoints += eval(6 * singlecr);
+                            } else if (lineg == "D") {
+                                totalPoints += eval(5 * singlecr);
+                            }
+
+                            if (index === matchingRows.length - 1) {
+                                // Create table and display SGPA for the last set of matching rows
+                                createTable(tableId, matchingRows, totalCredits, totalPoints, name, regi);
+                                tableId++;
+                                totalCredits = 0;
+                                totalPoints = 0;
+                                name = row[2]; // Assuming name is in the third column
+                                regi = 0;
+                            }
+                        });
+                    } else {
+                        alert('Registration number not found in the Excel sheet.');
+                    }
+                })
+                .catch(error => console.error('Error fetching Excel file:', error));
+        }
+
+        function findRowsByRegistrationNumber(sheet, registrationNumber) {
+            const grades = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+            const regNoColumnIndex = grades[0].indexOf('Reg_No');
+            const matchingRows = grades.filter(row => row[regNoColumnIndex] === registrationNumber);
+            return matchingRows;
+        }
+
+        function createTable(tableId, matchingRows, totalCredits, totalPoints, name, regi) {
+            const table = document.createElement('table');
+            table.id = `excelTable_${tableId}`;
+            table.classList.add('excelTable');
+
+            const thead = document.createElement('thead');
+            const tr = document.createElement('tr');
+            const th1 = document.createElement('th');
+            const th2 = document.createElement('th');
+            const th3 = document.createElement('th');
+            const th4 = document.createElement('th');
+            const th5 = document.createElement('th');
+
+            th1.innerHTML = 'SL No';
+            th2.innerHTML = 'sub code';
+            th3.innerHTML = 'sub';
+            th4.innerHTML = 'subcred';
+            th5.innerHTML = 'subgred';
+
+            tr.appendChild(th1);
+            tr.appendChild(th2);
+            tr.appendChild(th3);
+            tr.appendChild(th4);
+            tr.appendChild(th5);
+
+            thead.appendChild(tr);
+            table.appendChild(thead);
+
+            const tbody = document.createElement('tbody');
+            table.appendChild(tbody);
+
+            matchingRows.forEach((row, index) => {
+                const credits = parseFloat(row[6]);
+                const grade = row[7];
+
+                const tr = document.createElement('tr');
+                const slNoTd = document.createElement('td');
+                slNoTd.innerHTML = index + 1;
+                tr.appendChild(slNoTd);
+
+                for (let i = 1; i < row.length; i++) {
+                    if (i === 1 || i === 5) {
+                        continue;
+                    }
+                    if (i === 2) {
+                        name = row[i];
+                        continue;
+                    }
+
+                    const td = document.createElement('td');
+                    td.innerHTML = row[i];
+                    tr.appendChild(td);
+                }
+
+                tbody.appendChild(tr);
+            });
+
+            document.body.appendChild(table);
+
+            const regDisplay = document.getElementById('regDisplay');
+            const reg = regi;
+            regDisplay.innerHTML += `<p>Reg.No: ${reg}</p>`;
+
+            const nameDisplay = document.getElementById('nameDisplay');
+            nameDisplay.innerHTML += `<p>Name: ${name}</p>`;
+
+            const sgpaDisplay = document.getElementById('sgpaDisplay');
+            const sgpa = totalPoints / totalCredits;
+            sgpaDisplay.innerHTML += `<p>SGPA : ${sgpa.toFixed(4)}</p>`;
+        }
+    </script>
+</div>
+</body>
+</html>

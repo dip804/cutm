@@ -1,0 +1,251 @@
+.excelTable {
+    margin: auto;
+    border-collapse: collapse;
+    width: 80%;
+    margin-top: 20px;
+}
+
+.excelTable td, .excelTable th {
+    border: 1px solid #f37e7e;
+    padding: 10px;
+    text-align: left;
+}
+
+.sgpaDisplay {
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+body {
+    background:url(img1.png)no-repeat center center / cover;
+    display: block;
+    color: white;
+    font-weight: bold;
+    width: 100vw;
+    font-size: 20px;
+    
+    
+}
+
+.con {
+    background:transparent;
+    width: 60vw;
+    height: auto;
+    margin: auto;
+   
+}
+.con h1{
+    text-align: center;
+}
+.box {
+    display: flex;
+    margin: 30px 73px;
+}
+
+.text {
+    margin: 20px 16px;
+}
+
+.bt {
+    color: white;
+    margin: 20px ;
+    background: transparent;
+    font-size: 20px;
+    font-weight: bold;
+   
+}
+
+input{
+    width: 170px;
+    margin: auto;
+    background: transparent;
+    margin-bottom: 23px;
+    margin-top: 18px;
+    padding: 5px 25px;
+    font-size: 20px;
+    color: white;
+    text-overflow:  none;
+}
+
+input:hover{
+    border: 2px solid white;
+    color: white;
+    font-weight: bold;
+    border-radius: 10px;
+}
+
+.bt{
+    width: auto;
+    color: white;
+    position: relative;
+    background: transparent;
+    padding: 4px 7px;
+    font-size: large;
+    margin: 18px auto;
+}
+.bt:hover{
+    box-shadow: 0px 0px 14px 12px rgb(190, 35, 35);
+    cursor: pointer;   
+
+
+}
+.bt:before{
+content: "";
+position: absolute;
+left: 0;
+top: 0;
+width: 0;
+height: 0;
+border-top: 2px solid white;
+border-right:2px solid white ;
+animation:border-top 2s infinite alternate;
+}
+.bt:after{
+content: "";
+position: absolute;
+right: 0;
+bottom: 0;
+width: 0;
+height: 0;
+border-bottom: 2px solid white;
+border-left:2px solid white ;
+animation:border-bottom 3s infinite alternate;
+}
+@keyframes border-top{
+0%{width: 0px; height: 0px;}
+25%{width: 150px; height: 0px;}
+50%{width: 150px; height: 36px;}
+100%{width: 150px; height: 36px;}
+
+}
+
+@keyframes border-bottom {
+0%{width: 0px; height: 0px; opacity: 0;}
+50%{width: 0px; height: 0px; opacity: 0;}
+50.1%{width: 0px; height: 0px; opacity: 0;}
+75%{width: 150px; height: 0px; opacity: 1;}
+100%{width: 150px; height: 36px; opacity: 1;}
+}
+
+@keyframes borde{
+0%{
+left:150px ;
+animation-delay: 15s;
+}
+
+}
+
+
+
+@media screen and (max-width:900px) {
+
+    body {
+        display: block;
+        color: white;
+        font-weight: bold;
+        width: 100%;
+        font-size: 16px;    
+        
+    }
+
+    .con {
+        width: 100vw;    
+    }
+
+    
+.box {
+    display: flex;
+    margin: 10px 20px;
+}
+
+
+.bt {
+    color: white;
+    margin: 20px ;
+    background: transparent;
+    font-size: 20px;
+    font-weight: bold;
+   
+}
+
+input{
+    width: 127px;
+    margin: 20px;
+    background: transparent;
+    margin-bottom: 23px;
+    margin-top: 18px;
+    padding: 5px 20px;
+    font-size: 18px;
+    color: white;
+    text-overflow:  none;
+}
+
+input:hover{
+    border: 2px solid white;
+    color: white;
+    font-weight: bold;
+    border-radius: 10px;
+}
+
+.bt{
+    width: 100px;
+    color: white;
+    position: relative;
+    background: transparent;
+    padding: 2px 5px;
+    font-size: 20px;
+    margin: 10px auto;
+}
+.bt:hover{
+    box-shadow: 0px 0px 14px 12px rgb(190, 35, 35);
+    cursor: pointer;   
+
+
+}
+.bt:before{
+content: "";
+position: absolute;
+left: 0;
+top: 0;
+width: 0;
+height: 0;
+border-top: 2px solid white;
+border-right:2px solid white ;
+animation:border-top 2s infinite alternate;
+}
+.bt:after{
+content: "";
+position: absolute;
+right: 0;
+bottom: 0;
+width: 0;
+height: 0;
+border-bottom: 2px solid white;
+border-left:2px solid white ;
+animation:border-bottom 3s infinite alternate;
+}
+@keyframes border-top{
+0%{width: 0px; height: 0px;}
+25%{width: 100px; height: 0px;}
+50%{width: 100px; height: 70px;}
+100%{width: 100px; height: 70px;}
+
+}
+
+@keyframes border-bottom {
+0%{width: 0px; height: 0px; opacity: 0;}
+50%{width: 0px; height: 0px; opacity: 0;}
+50.1%{width: 0px; height: 0px; opacity: 0;}
+75%{width: 100px; height: 0px; opacity: 1;}
+100%{width: 100px; height: 70px; opacity: 1;}
+}
+
+@keyframes borde{
+0%{
+left:150px ;
+animation-delay: 10s;
+}
+
+}
+
+}
