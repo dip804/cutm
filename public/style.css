@@ -34,7 +34,7 @@ body {
     align-items: center;
 }
 
-img{
+.img img{
     align-items: center;
     justify-content: center;
     display: flex;
