@@ -27,11 +27,27 @@ body {
     
 }
 
+.img h1{
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+img{
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    height: 200px;
+    margin: auto;
+    margin-top: 200px
+}
 .con {
     background:transparent;
     width: 60vw;
     height: auto;
     margin: auto;
+    margin-top: 100px;
    
 }
 .con h1{
@@ -65,10 +81,12 @@ input{
     font-size: 20px;
     color: white;
     text-overflow:  none;
+    border: 2px solid white;
+    border-radius: 5px;
 }
 
 input:hover{
-    border: 2px solid white;
+    border: 3px solid rgb(218, 187, 187);
     color: white;
     font-weight: bold;
     border-radius: 10px;
@@ -86,7 +104,6 @@ input:hover{
 .bt:hover{
     box-shadow: 0px 0px 14px 12px rgb(190, 35, 35);
     cursor: pointer;   
-
 
 }
 .bt:before{
