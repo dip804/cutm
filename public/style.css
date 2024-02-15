@@ -16,6 +16,12 @@
     font-weight: bold;
 }
 
+#btn{
+    font-size: 19px;
+    padding: 7px;;
+}
+
+
 body {
     background:url(img1.png)no-repeat center center / cover;
     display: block;
@@ -47,7 +53,7 @@ body {
     width: 60vw;
     height: auto;
     margin: auto;
-    margin-top: 100px;
+    margin-top: 20px;
    
 }
 .con h1{
@@ -100,6 +106,7 @@ input:hover{
     padding: 4px 7px;
     font-size: large;
     margin: 18px auto;
+    font-size: 25px;
 }
 .bt:hover{
     box-shadow: 0px 0px 14px 12px rgb(190, 35, 35);
@@ -130,9 +137,9 @@ animation:border-bottom 3s infinite alternate;
 }
 @keyframes border-top{
 0%{width: 0px; height: 0px;}
-25%{width: 150px; height: 0px;}
-50%{width: 150px; height: 36px;}
-100%{width: 150px; height: 36px;}
+25%{width: 85px; height: 0px;}
+50%{width: 85px; height: 36px;}
+100%{width: 85px; height: 36px;}
 
 }
 
@@ -140,8 +147,8 @@ animation:border-bottom 3s infinite alternate;
 0%{width: 0px; height: 0px; opacity: 0;}
 50%{width: 0px; height: 0px; opacity: 0;}
 50.1%{width: 0px; height: 0px; opacity: 0;}
-75%{width: 150px; height: 0px; opacity: 1;}
-100%{width: 150px; height: 36px; opacity: 1;}
+75%{width: 85px; height: 0px; opacity: 1;}
+100%{width: 85px; height: 36px; opacity: 1;}
 }
 
 @keyframes borde{
@@ -154,37 +161,34 @@ animation-delay: 15s;
 
 
 
-@media screen and (max-width:1500px) {
+@media screen and (max-width:1300px) {
 
     .excelTable {
-    margin: auto;
-    border-collapse: collapse;
-    width: 100%;
+    width: 20%;
     margin-top: 20px;
+    padding: 0%;
 }
 .sgpaDisplay {
     margin-top: 20px;
     font-weight: bold;
     font-size:25px;
+    color: red;
 }
     body {
         display: block;
         color: white;
         font-weight: bold;
-        width: 100%;
-        height:100%;
-        font-size: 16px;    
+        width: 100vw;  
         
     }
 
     .con {
         width: 100vw;  
-         height:100vh;
     }
 
     
 .box {
-    display: flex;
+    display :inline;
     margin: 10px 20px;
 }
 
@@ -199,15 +203,13 @@ animation-delay: 15s;
 }
 
 input{
-    width: 127px;
-    margin: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60vw;
     background: transparent;
-    margin-bottom: 23px;
-    margin-top: 18px;
-    padding: 5px 20px;
     font-size: 20px;
     color: white;
-    text-overflow:  none;
      border: 2px solid white;
     color: white;
 }
@@ -218,10 +220,12 @@ input:hover{
 }
 
 .bt{
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100px;
     color: white;
     position: relative;
-    background: transparent;
     padding: 2px 5px;
     font-size: 22px;
     margin: 10px auto;
@@ -257,8 +261,8 @@ animation:border-bottom 3s infinite alternate;
 @keyframes border-top{
 0%{width: 0px; height: 0px;}
 25%{width: 100px; height: 0px;}
-50%{width: 100px; height: 50px;}
-100%{width: 100px; height: 50px;}
+50%{width: 95px; height: 30px;}
+100%{width: 95px; height: 30px;}
 
 }
 
@@ -266,8 +270,8 @@ animation:border-bottom 3s infinite alternate;
 0%{width: 0px; height: 0px; opacity: 0;}
 50%{width: 0px; height: 0px; opacity: 0;}
 50.1%{width: 0px; height: 0px; opacity: 0;}
-75%{width: 100px; height: 0px; opacity: 1;}
-100%{width: 100px; height: 50px; opacity: 1;}
+75%{width: 95px; height: 0px; opacity: 1;}
+100%{width: 95px; height: 30px; opacity: 1;}
 }
 
 @keyframes borde{
