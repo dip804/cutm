@@ -251,8 +251,8 @@ animation:border-bottom 3s infinite alternate;
 @keyframes border-top{
 0%{width: 0px; height: 0px;}
 25%{width: 100px; height: 0px;}
-50%{width: 100px; height: 70px;}
-100%{width: 100px; height: 70px;}
+50%{width: 100px; height: 50px;}
+100%{width: 100px; height: 50px;}
 
 }
 
@@ -261,7 +261,7 @@ animation:border-bottom 3s infinite alternate;
 50%{width: 0px; height: 0px; opacity: 0;}
 50.1%{width: 0px; height: 0px; opacity: 0;}
 75%{width: 100px; height: 0px; opacity: 1;}
-100%{width: 100px; height: 70px; opacity: 1;}
+100%{width: 100px; height: 50px; opacity: 1;}
 }
 
 @keyframes borde{
