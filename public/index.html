@@ -44,6 +44,8 @@
     <script>
         function calculateSGPA() {
             const registrationNumber = document.getElementById('registrationNumber').value;
+            var reeee=registrationNumber;
+            console.log("log in"+reeee);
             var regi = registrationNumber; // Use regi as the variable name
             var name;
 
@@ -100,7 +102,7 @@
                             }
                         });
                     } else {
-                        alert('Registration number not found in the Excel sheet.');
+                        alert('Registration number not found .');
                     }
                 })
                 .catch(error => console.error('Error fetching Excel file:', error));
