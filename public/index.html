@@ -39,8 +39,8 @@
     <p id="nameDisplay" class="nameDisplay"></p>
     <p id="regDisplay" class="regDisplay"></p>
     <p id="sgpaDisplay" class="sgpaDisplay"></p>
-        <p id="" class="Sem-3">Sem-3</p>
-        <p id="" class="SOET">SOET</p>
+        <p id="Sem" class="Sem"></p>
+        <p id="SOET" class="SOET"></p>
         
         
 
@@ -196,6 +196,14 @@
             const sgpaDisplay = document.getElementById('sgpaDisplay');
             const sgpa = totalPoints / totalCredits;
             sgpaDisplay.innerHTML += `<p>CGPA : ${sgpa.toFixed(4)}</p>`;
+            
+             const sgpaDisplay = document.getElementById('sem');
+            const sgpa = totalPoints / totalCredits;
+            sgpaDisplay.innerHTML += `<p>sEM-3</p>`;
+            
+             const sgpaDisplay = document.getElementById('SOET');
+            const sgpa = totalPoints / totalCredits;
+            sgpaDisplay.innerHTML += `<p>SOET</p>`;
         }
     </script>
 </div>
