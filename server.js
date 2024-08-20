@@ -1,43 +1,76 @@
 const WebSocket = require('ws');
-const express = require('express');
 const http = require('http');
+const express = require('express');
+const path = require('path');
+const { exec } = require('child_process');
 
-// Setup Express app
+// Create an Express app
 const app = express();
 const server = http.createServer(app);
 
-// WebSocket Server for user commands
-const wss = new WebSocket.Server({ server, port: 5555 });
+// Create WebSocket servers
+const wsPort1 = 5555;
+const wsPort2 = 8888;
 
-// Command Relay Server
-const commandRelay = new WebSocket.Server({ port: 8888 });
+const wss1 = new WebSocket.Server({ noServer: true });
+const wss2 = new WebSocket.Server({ noServer: true });
 
-wss.on('connection', ws => {
-    console.log('User connected');
+// Handle WebSocket connections for port 5555 (user connections)
+const clients = [];
+wss1.on('connection', (ws) => {
+    console.log('Client connected on port 5555');
+    clients.push(ws);
 
-    ws.on('message', message => {
-        console.log(`Received message: ${message}`);
-        // Broadcast message to command relay server
-        commandRelay.clients.forEach(client => {
-            if (client.readyState === WebSocket.OPEN) {
-                client.send(message);
-            }
+    // Broadcast command output to all clients on port 8888
+    ws.on('message', (message) => {
+        console.log(`Received command: ${message}`);
+        exec(message, (error, stdout, stderr) => {
+            const response = {
+                stdout: stdout,
+                stderr: stderr
+            };
+            clients.forEach(client => {
+                client.send(JSON.stringify(response));
+            });
         });
     });
 
     ws.on('close', () => {
-        console.log('User disconnected');
+        const index = clients.indexOf(ws);
+        if (index > -1) {
+            clients.splice(index, 1);
+        }
     });
 });
 
-commandRelay.on('connection', ws => {
-    console.log('Command relay client connected');
+// Handle WebSocket connections for port 8888 (view command output)
+wss2.on('connection', (ws) => {
+    console.log('Viewer connected on port 8888');
+    ws.on('message', (message) => {
+        console.log(`Received message: ${message}`);
+    });
 });
 
-server.listen(5555, () => {
-    console.log('WebSocket server running on port 5555');
+// Handle HTTP request and serve the HTML file
+app.use(express.static(path.join(__dirname, 'public')));
+
+server.on('upgrade', (request, socket, head) => {
+    if (request.url === '/ws1') {
+        wss1.handleUpgrade(request, socket, head, (ws) => {
+            wss1.emit('connection', ws, request);
+        });
+    } else if (request.url === '/ws2') {
+        wss2.handleUpgrade(request, socket, head, (ws) => {
+            wss2.emit('connection', ws, request);
+        });
+    } else {
+        socket.destroy();
+    }
 });
 
-server.listen(8888, () => {
-    console.log('Command relay server running on port 8888');
+server.listen(wsPort1, () => {
+    console.log(`WebSocket server running on ws://localhost:${wsPort1}`);
+});
+server.listen(wsPort2, () => {
+    console.log(`WebSocket server running on ws://localhost:${wsPort2}`);
 });
