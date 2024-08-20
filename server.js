@@ -1,37 +1,23 @@
 const WebSocket = require('ws');
 const http = require('http');
-const express = require('express');
-const path = require('path');
-const { exec } = require('child_process');
 
-// Create an Express app
-const app = express();
-const server = http.createServer(app);
-
-// Create WebSocket servers
 const wsPort1 = 5555;
 const wsPort2 = 8888;
 
+const server = http.createServer();
 const wss1 = new WebSocket.Server({ noServer: true });
 const wss2 = new WebSocket.Server({ noServer: true });
 
-// Handle WebSocket connections for port 5555 (user connections)
 const clients = [];
+
+// Handle WebSocket connections for port 5555
 wss1.on('connection', (ws) => {
-    console.log('Client connected on port 5555');
     clients.push(ws);
 
-    // Broadcast command output to all clients on port 8888
     ws.on('message', (message) => {
-        console.log(`Received command: ${message}`);
-        exec(message, (error, stdout, stderr) => {
-            const response = {
-                stdout: stdout,
-                stderr: stderr
-            };
-            clients.forEach(client => {
-                client.send(JSON.stringify(response));
-            });
+        require('child_process').exec(message, (error, stdout, stderr) => {
+            const response = { stdout, stderr };
+            clients.forEach(client => client.send(JSON.stringify(response)));
         });
     });
 
@@ -43,16 +29,10 @@ wss1.on('connection', (ws) => {
     });
 });
 
-// Handle WebSocket connections for port 8888 (view command output)
+// Handle WebSocket connections for port 8888
 wss2.on('connection', (ws) => {
-    console.log('Viewer connected on port 8888');
-    ws.on('message', (message) => {
-        console.log(`Received message: ${message}`);
-    });
+    // Additional logic for port 8888 if needed
 });
-
-// Handle HTTP request and serve the HTML file
-app.use(express.static(path.join(__dirname, 'public')));
 
 server.on('upgrade', (request, socket, head) => {
     if (request.url === '/ws1') {
@@ -68,9 +48,5 @@ server.on('upgrade', (request, socket, head) => {
     }
 });
 
-server.listen(wsPort1, () => {
-    console.log(`WebSocket server running on ws://localhost:${wsPort1}`);
-});
-server.listen(wsPort2, () => {
-    console.log(`WebSocket server running on ws://localhost:${wsPort2}`);
-});
+server.listen(wsPort1, () => console.log(`WebSocket server listening on port ${wsPort1}`));
+server.listen(wsPort2, () => console.log(`WebSocket server listening on port ${wsPort2}`));
