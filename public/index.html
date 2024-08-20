@@ -3,12 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Socket Example</title>
-    <script src="script.js" defer></script>
+    <title>WebSocket Client</title>
+    <style>
+        #commands {
+            height: 400px;
+            border: 1px solid black;
+            overflow-y: scroll;
+        }
+    </style>
 </head>
 <body>
-    <h1>Socket Communication</h1>
-    <button id="sendMessage">Send Message</button>
-    <div id="response"></div>
+    <h1>WebSocket Client</h1>
+    <textarea id="messageInput" placeholder="Type your message..."></textarea>
+    <button onclick="sendMessage()">Send</button>
+    
+    <h2>Commands</h2>
+    <div id="commands"></div>
+
+    <script>
+        const ws = new WebSocket('ws://localhost:5555');
+        const commandsDiv = document.getElementById('commands');
+
+        ws.onopen = () => {
+            console.log('Connected to WebSocket server');
+        };
+
+        ws.onmessage = (event) => {
+            console.log(`Received message: ${event.data}`);
+        };
+
+        ws.onclose = () => {
+            console.log('Disconnected from WebSocket server');
+        };
+
+        function sendMessage() {
+            const message = document.getElementById('messageInput').value;
+            ws.send(message);
+        }
+
+        // Connect to command relay server
+        const commandRelay = new WebSocket('ws://localhost:8888');
+
+        commandRelay.onmessage = (event) => {
+            const command = document.createElement('div');
+            command.textContent = event.data;
+            commandsDiv.appendChild(command);
+            commandsDiv.scrollTop = commandsDiv.scrollHeight;
+        };
+
+        commandRelay.onopen = () => {
+            console.log('Connected to command relay server');
+        };
+
+        commandRelay.onclose = () => {
+            console.log('Disconnected from command relay server');
+        };
+    </script>
 </body>
 </html>
