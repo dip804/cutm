@@ -1,7 +1,7 @@
 {
   "name": "websocket-server",
   "version": "1.0.0",
-  "description": "WebSocket server with Express and WebSocket support",
+  "description": "A simple WebSocket server example",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
@@ -9,10 +9,8 @@
   },
   "dependencies": {
     "express": "^4.18.2",
-    "ws": "^8.10.0"
+    "ws": "^8.13.0",
+    "http": "0.0.1-security"
   },
-  "engines": {
-    "node": "20.x"
-  },
-  "license": "MIT"
+  "license": "ISC"
 }
