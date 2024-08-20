@@ -1,47 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>WebSocket Command Interface</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #messages {
+            width: 100%;
+            height: 300px;
+            margin-bottom: 10px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+        }
+        #messageInput {
+            width: 80%;
+        }
+        #sendButton {
+            width: 18%;
+        }
+    </style>
 </head>
 <body>
-    <h1>WebSocket Command Interface</h1>
-    <textarea id="cmdInput" rows="4" cols="50" placeholder="Type your command here..."></textarea><br>
-    <button id="sendCmd">Send Command</button>
-    <hr>
-    <h2>Command Output</h2>
-    <pre id="output"></pre>
+    <h1>WebSocket Chat</h1>
+    <textarea id="messages" readonly></textarea><br>
+    <input id="messageInput" type="text">
+    <button id="sendButton">Send</button>
+
     <script>
-        const cmdInput = document.getElementById('cmdInput');
-        const sendCmdButton = document.getElementById('sendCmd');
-        const output = document.getElementById('output');
-
-        // Connect to WebSocket server on port 5555
-        const ws = new WebSocket(`ws://localhost:5555/ws1`);
-
-        ws.onopen = () => {
-            console.log('Connected to WebSocket server on port 5555');
-        };
+        // Update to your deployed server's URL
+        const ws = new WebSocket(`wss://cgpa-nqij.onrender.com:8888`);
 
         ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            output.textContent += `stdout:\n${data.stdout}\nstderr:\n${data.stderr}\n\n`;
+            const messages = document.getElementById('messages');
+            messages.value += `${event.data}\n`;
+            messages.scrollTop = messages.scrollHeight; // Auto-scroll to the bottom
         };
 
-        sendCmdButton.onclick = () => {
-            const command = cmdInput.value;
-            ws.send(command);
-        };
-
-        // Connect to WebSocket server on port 8888 for viewing
-        const viewerWs = new WebSocket(`ws://localhost:8888/ws2`);
-        viewerWs.onopen = () => {
-            console.log('Connected to WebSocket server on port 8888');
-        };
-
-        viewerWs.onmessage = (event) => {
-            const message = event.data;
-            console.log(`Viewer received: ${message}`);
-        };
+        document.getElementById('sendButton').addEventListener('click', () => {
+            const input = document.getElementById('messageInput');
+            const message = input.value;
+            if (message) {
+                ws.send(message);
+                input.value = '';
+            }
+        });
     </script>
 </body>
 </html>
