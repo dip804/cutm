@@ -1,62 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebSockett Client</title>
-    <style>
-        #commands {
-            height: 400px;
-            border: 1px solid black;
-            overflow-y: scroll;
-        }
-    </style>
+    <title>WebSocket Server</title>
 </head>
 <body>
-    <h1>WebSocket Client</h1>
-    <textarea id="messageInput" placeholder="Type your message..."></textarea>
-    <button onclick="sendMessage()">Send</button>
-    
-    <h2>Commands</h2>
-    <div id="commands"></div>
-
+    <h1>WebSocket Command Interface</h1>
+    <textarea id="cmdInput" rows="4" cols="50" placeholder="Type your command here..."></textarea><br>
+    <button id="sendCmd">Send Command</button>
+    <hr>
+    <h2>Command Output</h2>
+    <pre id="output"></pre>
     <script>
-        const ws = new WebSocket('ws://localhost:5555');
-        const commandsDiv = document.getElementById('commands');
+        const cmdInput = document.getElementById('cmdInput');
+        const sendCmdButton = document.getElementById('sendCmd');
+        const output = document.getElementById('output');
+
+        // Connect to WebSocket server on port 5555
+        const ws = new WebSocket('ws://localhost:5555/ws1');
 
         ws.onopen = () => {
-            console.log('Connected to WebSocket server');
+            console.log('Connected to WebSocket server on port 5555');
         };
 
         ws.onmessage = (event) => {
-            console.log(`Received message: ${event.data}`);
+            const data = JSON.parse(event.data);
+            output.textContent += `stdout:\n${data.stdout}\nstderr:\n${data.stderr}\n\n`;
         };
 
-        ws.onclose = () => {
-            console.log('Disconnected from WebSocket server');
+        sendCmdButton.onclick = () => {
+            const command = cmdInput.value;
+            ws.send(command);
         };
 
-        function sendMessage() {
-            const message = document.getElementById('messageInput').value;
-            ws.send(message);
-        }
-
-        // Connect to command relay server
-        const commandRelay = new WebSocket('ws://localhost:8888');
-
-        commandRelay.onmessage = (event) => {
-            const command = document.createElement('div');
-            command.textContent = event.data;
-            commandsDiv.appendChild(command);
-            commandsDiv.scrollTop = commandsDiv.scrollHeight;
+        // Connect to WebSocket server on port 8888 for viewing
+        const viewerWs = new WebSocket('ws://localhost:8888/ws2');
+        viewerWs.onopen = () => {
+            console.log('Connected to WebSocket server on port 8888');
         };
 
-        commandRelay.onopen = () => {
-            console.log('Connected to command relay server');
-        };
-
-        commandRelay.onclose = () => {
-            console.log('Disconnected from command relay server');
+        viewerWs.onmessage = (event) => {
+            const message = event.data;
+            console.log(`Viewer received: ${message}`);
         };
     </script>
 </body>
