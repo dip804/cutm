@@ -1,13 +1,11 @@
+// save this as app.js
 const express = require("express");
-const path=require('path');
-
+const path = require('path');
 
 const port = process.env.PORT || 3001;
-
 const app = express();
-const publicpath=path.join(__dirname,'public')
+const publicpath = path.join(__dirname, 'public');
 console.log(publicpath);
-
 
 app.use(express.static(publicpath));
 
