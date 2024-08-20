@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>WebSocket Server</title>
+    <title>WebSocket Command Interface</title>
 </head>
 <body>
     <h1>WebSocket Command Interface</h1>
@@ -16,7 +16,7 @@
         const output = document.getElementById('output');
 
         // Connect to WebSocket server on port 5555
-        const ws = new WebSocket('ws://localhost:5555/ws1');
+        const ws = new WebSocket(`ws://localhost:5555/ws1`);
 
         ws.onopen = () => {
             console.log('Connected to WebSocket server on port 5555');
@@ -33,7 +33,7 @@
         };
 
         // Connect to WebSocket server on port 8888 for viewing
-        const viewerWs = new WebSocket('ws://localhost:8888/ws2');
+        const viewerWs = new WebSocket(`ws://localhost:8888/ws2`);
         viewerWs.onopen = () => {
             console.log('Connected to WebSocket server on port 8888');
         };
