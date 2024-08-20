@@ -1,27 +1,27 @@
 // app.js
-const express = require("express");
+const express = require('express');
 const path = require('path');
 const http = require('http');
 const WebSocket = require('ws');
 
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3001; // HTTP port
+const wsPort = 8888; // WebSocket port
 const app = express();
-const publicpath = path.join(__dirname, 'public');
-console.log(publicpath);
+const publicPath = path.join(__dirname, 'public');
 
 // Serve static files
-app.use(express.static(publicpath));
+app.use(express.static(publicPath));
 
 // Create an HTTP server
 const server = http.createServer(app);
 
 // Create a WebSocket server
-const wss = new WebSocket.Server({ server });
+const wss = new WebSocket.Server({ noServer: true });
 
-// WebSocket connection handler
+// Handle WebSocket connections
 wss.on('connection', (ws) => {
   console.log('New WebSocket connection');
-  
+
   ws.on('message', (message) => {
     console.log(`Received message: ${message}`);
     // Broadcast message to all clients
@@ -37,10 +37,20 @@ wss.on('connection', (ws) => {
   });
 });
 
-// Start the server
-server.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
+// Upgrade HTTP server to handle WebSocket connections
+server.on('upgrade', (request, socket, head) => {
+  wss.handleUpgrade(request, socket, head, (ws) => {
+    wss.emit('connection', ws, request);
+  });
 });
 
-server.keepAliveTimeout = 120 * 1000;
-server.headersTimeout = 120 * 1000;
+// Start the HTTP server
+server.listen(port, () => {
+  console.log(`HTTP server listening on port ${port}`);
+});
+
+// Start the WebSocket server separately on port 8888
+const wsServer = http.createServer();
+wsServer.listen(wsPort, () => {
+  console.log(`WebSocket server listening on port ${wsPort}`);
+});
