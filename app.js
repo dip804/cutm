@@ -15,8 +15,8 @@ app.use(express.static(publicPath));
 // Create an HTTP server
 const server = http.createServer(app);
 
-// Create a WebSocket server
-const wss = new WebSocket.Server({ noServer: true });
+// Create a WebSocket server on the same HTTP server
+const wss = new WebSocket.Server({ server });
 
 // Handle WebSocket connections
 wss.on('connection', (ws) => {
@@ -37,20 +37,35 @@ wss.on('connection', (ws) => {
   });
 });
 
-// Upgrade HTTP server to handle WebSocket connections
-server.on('upgrade', (request, socket, head) => {
-  wss.handleUpgrade(request, socket, head, (ws) => {
-    wss.emit('connection', ws, request);
+// Start the HTTP and WebSocket server on port 3001
+server.listen(port, () => {
+  console.log(`HTTP and WebSocket server listening on port ${port}`);
+});
+
+// Create a separate WebSocket server on port 8888
+const wsServer = http.createServer();
+const wss8888 = new WebSocket.Server({ server: wsServer });
+
+// Handle WebSocket connections on port 8888
+wss8888.on('connection', (ws) => {
+  console.log('New WebSocket connection on port 8888');
+
+  ws.on('message', (message) => {
+    console.log(`Received message on port 8888: ${message}`);
+    // Broadcast message to all clients on port 8888
+    wss8888.clients.forEach(client => {
+      if (client !== ws && client.readyState === WebSocket.OPEN) {
+        client.send(message);
+      }
+    });
+  });
+
+  ws.on('close', () => {
+    console.log('WebSocket connection closed on port 8888');
   });
 });
 
-// Start the HTTP server
-server.listen(port, () => {
-  console.log(`HTTP server listening on port ${port}`);
-});
-
-// Start the WebSocket server separately on port 8888
-const wsServer = http.createServer();
+// Start the WebSocket server on port 8888
 wsServer.listen(wsPort, () => {
   console.log(`WebSocket server listening on port ${wsPort}`);
 });
