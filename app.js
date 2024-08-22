@@ -6,7 +6,6 @@ const net = require('net');
 
 // Set up Express and paths
 const port = process.env.PORT || 3001; // HTTP port
-const wsPort = 8888; // WebSocket port
 const clientPort = 8443; // TCP port for client connections
 const adminPort = 8080; // TCP port for admin connections
 
@@ -54,8 +53,6 @@ const clientServer = net.createServer((clientSocket) => {
     const clientId = `${clientSocket.remoteAddress}:${clientSocket.remotePort}`;
     console.log(`Client connected: ${clientId}`);
     clients[clientId] = clientSocket;
-
-    console.log(`Client IP Address: ${clientSocket.remoteAddress}`);
 
     // Notify the admin about the new client connection
     if (adminSocket) {
