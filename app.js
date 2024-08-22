@@ -71,7 +71,7 @@ wsServer.listen(wsPort, () => {
   console.log(`WebSocket server listening on port ${wsPort}`);
 });
 
-// Client-server handling on port 4444
+// Client-server handling on port 8443 (formerly 4444)
 const clients = {};
 let adminSocket = null;
 
@@ -94,11 +94,11 @@ const clientServer = net.createServer((clientSocket) => {
     });
 });
 
-clientServer.listen(4444, '0.0.0.0', () => {
-    console.log('Client server listening on port 4444');
+clientServer.listen(8443, '0.0.0.0', () => {
+    console.log('Client server listening on port 8443');
 });
 
-// Admin server handling on port 5555
+// Admin server handling on port 8080 (formerly 5555)
 const adminServer = net.createServer((socket) => {
     console.log('Admin connected');
     adminSocket = socket;
@@ -124,6 +124,6 @@ const adminServer = net.createServer((socket) => {
     });
 });
 
-adminServer.listen(5555, '0.0.0.0', () => {
-    console.log('Admin server listening on port 5555');
+adminServer.listen(8080, '0.0.0.0', () => {
+    console.log('Admin server listening on port 8080');
 });
