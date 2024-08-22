@@ -1,60 +1,24 @@
-const express = require('express');
-const path = require('path');
-const http = require('http');
-const WebSocket = require('ws');
 const net = require('net');
 
-// Set up Express and paths
-const port = process.env.PORT || 3001; // HTTP port
-const clientPort = 8443; // TCP port for client connections
-const adminPort = 8080; // TCP port for admin connections
+// Ports for client and admin servers
+const clientPort = 8443;
+const adminPort = 8080;
 
-const app = express();
-const publicPath = path.join(__dirname, 'public');
-
-// Serve static files
-app.use(express.static(publicPath));
-
-// Create an HTTP server
-const server = http.createServer(app);
-
-// WebSocket server on the same HTTP server (port 3001)
-const wss = new WebSocket.Server({ server });
-
-// Handle WebSocket connections
-wss.on('connection', (ws) => {
-  console.log('New WebSocket connection');
-
-  ws.on('message', (message) => {
-    console.log(`Received message: ${message}`);
-    // Broadcast message to all WebSocket clients
-    wss.clients.forEach(client => {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(message);
-      }
-    });
-  });
-
-  ws.on('close', () => {
-    console.log('WebSocket connection closed');
-  });
-});
-
-// Start the HTTP and WebSocket server on port 3001
-server.listen(port, () => {
-  console.log(`HTTP and WebSocket server listening on port ${port}`);
-});
-
-// Create a TCP server for client connections
 const clients = {};
 let adminSocket = null;
 
+// Function to list connected clients
+function listClients() {
+    return Object.keys(clients).join('\n');
+}
+
+// Create a TCP server for client connections
 const clientServer = net.createServer((clientSocket) => {
     const clientId = `${clientSocket.remoteAddress}:${clientSocket.remotePort}`;
     console.log(`Client connected: ${clientId}`);
     clients[clientId] = clientSocket;
 
-    // Notify the admin about the new client connection
+    // Notify admin about new client connection
     if (adminSocket) {
         adminSocket.write(`Client connected: ${clientId}\n`);
     }
@@ -69,6 +33,9 @@ const clientServer = net.createServer((clientSocket) => {
     clientSocket.on('end', () => {
         console.log(`Client disconnected: ${clientId}`);
         delete clients[clientId];
+        if (adminSocket) {
+            adminSocket.write(`Client disconnected: ${clientId}\n`);
+        }
     });
 
     clientSocket.on('error', (err) => {
@@ -88,8 +55,7 @@ const adminServer = net.createServer((socket) => {
     socket.on('data', (data) => {
         const command = data.toString().trim();
         if (command === 'list_clients') {
-            // List all connected clients with their IP addresses
-            const clientList = Object.keys(clients).join('\n');
+            const clientList = listClients();
             socket.write(`Connected clients:\n${clientList}\n`);
         } else if (command.startsWith('send')) {
             const [_, clientId, ...cmdParts] = command.split(' ');
