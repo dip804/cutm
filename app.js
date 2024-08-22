@@ -56,7 +56,12 @@ const clientServer = net.createServer((clientSocket) => {
     clients[clientId] = clientSocket;
 
     console.log(`Client IP Address: ${clientSocket.remoteAddress}`);
-    
+
+    // Notify the admin about the new client connection
+    if (adminSocket) {
+        adminSocket.write(`Client connected: ${clientId}\n`);
+    }
+
     clientSocket.on('data', (data) => {
         console.log(`Received from ${clientId}: ${data.toString().trim()}`);
         if (adminSocket) {
