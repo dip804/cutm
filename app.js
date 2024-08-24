@@ -4,8 +4,8 @@ const path = require('path');
 const WebSocket = require('ws');
 
 const app = express();
-const port = 5555;  // Port for admin web interface
-const cmdPort = 4444;  // Port for client connections
+const adminPort = 5555;  // Port for admin web interface
+const clientPort = 4444;  // Port for client connections
 
 let clients = [];
 
@@ -40,15 +40,15 @@ const cmdServer = net.createServer((socket) => {
     });
 });
 
-cmdServer.listen(cmdPort, () => {
-    console.log(`Command server listening on port ${cmdPort}`);
+cmdServer.listen(clientPort, () => {
+    console.log(`Command server listening on port ${clientPort}`);
 });
 
 // HTTP server to serve the admin interface
 app.use(express.static(path.join(__dirname, 'public')));
 
-const server = app.listen(port, () => {
-    console.log(`Admin interface available at http://localhost:${port}`);
+const server = app.listen(adminPort, () => {
+    console.log(`Admin interface available at http://localhost:${adminPort}`);
 });
 
 // Handle WebSocket upgrade
